@@ -1,4 +1,3 @@
 .vs
-VoxelicousEngine/out
-VoxelicousEngine/bin
-VoxelicousEngine/.vs
+out
+bin
