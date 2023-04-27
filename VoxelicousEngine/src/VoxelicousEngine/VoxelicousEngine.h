@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <iostream>
-#include "VoxelicousEngine/Core/App.h"
-#include "VoxelicousEngine/Core/EntryPoint.h"
+#include "Core/App.h"
+#include "Core/Layer.h"
+#include "Core/EntryPoint.h"
 
 // TODO: Reference additional headers your program requires here.

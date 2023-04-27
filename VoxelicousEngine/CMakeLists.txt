@@ -6,11 +6,15 @@ file(GLOB_RECURSE VOXELICOUS_ENGINE_HEADERS "${VOXELICOUS_ENGINE_SRC_DIR}/Voxeli
 
 file(GLOB_RECURSE VOXELICOUS_ENGINE_SOURCES "${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/*.cpp")
 
-set(SPDLOG_INCLUDE_DIR "${DEFAULT_DIR}/VoxelicousEngine/submodules/spdlog/include")
+find_package(OpenGL REQUIRED)
 
 add_library(VoxelicousEngine SHARED ${VOXELICOUS_ENGINE_SOURCES} ${VOXELICOUS_ENGINE_HEADERS})
 
-target_include_directories(VoxelicousEngine PRIVATE "${SPDLOG_INCLUDE_DIR}")
+target_link_libraries(VoxelicousEngine glfw "opengl32.lib")
+
+target_include_directories(VoxelicousEngine PRIVATE "${SPDLOG_INCLUDE_DIR}" "${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine" "${GLFW_INCLUDE_DIR}")
+
+target_precompile_headers(VoxelicousEngine PRIVATE "${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/vepch.h")
 
 target_compile_definitions(VoxelicousEngine PRIVATE VE_PLATFORM_WINDOWS VE_BUILD_DLL)
 
