@@ -1,0 +1,3 @@
+[submodule "VoxelicousEngine/submodules/spdlog"]
+	path = VoxelicousEngine/submodules/spdlog
+	url = https://github.com/gabime/spdlog

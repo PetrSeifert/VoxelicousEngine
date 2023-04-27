@@ -12,6 +12,7 @@ endif()
 set(VOXELICOUS_ENGINE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/VoxelicousEngine/src")
 set(FIRSTAPP_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/FirstApp/src")
 set(DEFAULT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
 add_subdirectory("VoxelicousEngine")
 add_subdirectory("FirstApp")
 

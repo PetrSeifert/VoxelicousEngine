@@ -2,21 +2,16 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("VoxelicousEngine" LANGUAGES CXX)
 
+file(GLOB_RECURSE VOXELICOUS_ENGINE_HEADERS "${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/*.h")
 
-set(VOXELICOUS_ENGINE_HEADERS
-	"${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/VoxelicousEngine.h"
-	"${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/Core/App.h"
-	"${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/Core/Core.h"
-	"${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/Core/EntryPoint.h"
-)
+file(GLOB_RECURSE VOXELICOUS_ENGINE_SOURCES "${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/*.cpp")
 
-set(VOXELICOUS_ENGINE_SOURCES
-	"${VOXELICOUS_ENGINE_SRC_DIR}/VoxelicousEngine/Core/App.cpp"
-)
+set(SPDLOG_INCLUDE_DIR "${DEFAULT_DIR}/VoxelicousEngine/submodules/spdlog/include")
 
 add_library(VoxelicousEngine SHARED ${VOXELICOUS_ENGINE_SOURCES} ${VOXELICOUS_ENGINE_HEADERS})
 
-target_include_directories(VoxelicousEngine PUBLIC "${VOXELICOUS_ENGINE_SRC_DIR}")
+target_include_directories(VoxelicousEngine PRIVATE "${SPDLOG_INCLUDE_DIR}")
+
 target_compile_definitions(VoxelicousEngine PRIVATE VE_PLATFORM_WINDOWS VE_BUILD_DLL)
 
 set_target_properties(VoxelicousEngine PROPERTIES
