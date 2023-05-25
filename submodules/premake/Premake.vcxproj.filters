@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Editor">
+      <UniqueIdentifier>{77567F1E-E3C0-3395-2CFF-E43A98A811EA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\VoxelicousEngine">
+      <UniqueIdentifier>{B7246958-2386-4666-ACF3-8C1818547D25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\VoxelicousEngine\submodules">
+      <UniqueIdentifier>{491086A7-3536-500E-1E7C-D5D90A4175DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\VoxelicousEngine\submodules\GLFW">
+      <UniqueIdentifier>{2861934B-941A-FEF5-1D7A-18D08932B465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\VoxelicousEngine\submodules\imgui">
+      <UniqueIdentifier>{737079C0-5F57-3BB8-08A8-A1D5F46DB41E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Editor\premake5.lua">
+      <Filter>..\Editor</Filter>
+    </None>
+    <None Include="..\..\VoxelicousEngine\premake5.lua">
+      <Filter>..\VoxelicousEngine</Filter>
+    </None>
+    <None Include="..\..\VoxelicousEngine\submodules\GLFW\premake5.lua">
+      <Filter>..\VoxelicousEngine\submodules\GLFW</Filter>
+    </None>
+    <None Include="..\..\VoxelicousEngine\submodules\imgui\premake5.lua">
+      <Filter>..\VoxelicousEngine\submodules\imgui</Filter>
+    </None>
+    <None Include="..\..\premake5.lua">
+      <Filter>..</Filter>
+    </None>
+    <None Include="premake5.lua" />
+  </ItemGroup>
+</Project>
