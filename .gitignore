@@ -1,4 +1,10 @@
 .vs
+.idea
 out
 bin
 bin-int
+scripts/__pycache__
+VoxelicousEngine/submodules/VulkanSDK
+*.vcxproj.filters
+*.vcxproj
+*.sln

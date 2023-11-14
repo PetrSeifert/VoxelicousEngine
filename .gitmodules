@@ -1,13 +1,6 @@
 [submodule "VoxelicousEngine/submodules/spdlog"]
 	path = VoxelicousEngine/submodules/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "VoxelicousEngine/submodules/GLFW"]
-	path = VoxelicousEngine/submodules/GLFW
-	url = https://github.com/glfw/glfw
-
 [submodule "VoxelicousEngine/submodules/glm"]
 	path = VoxelicousEngine/submodules/glm
 	url = https://github.com/g-truc/glm
-[submodule "VoxelicousEngine/submodules/imgui"]
-	path = VoxelicousEngine/submodules/imgui
-	url = https://github.com/ocornut/imgui

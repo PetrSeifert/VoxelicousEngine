@@ -4,7 +4,7 @@
 #include "Events/Event.h"
 #include "Renderer/Instance.h"
 #include "Renderer/SwapChain.h"
-#include "C:/Programs/VoxelicousEngine/VoxelicousEngine/submodules/GLFW/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 namespace VoxelicousEngine 
 {

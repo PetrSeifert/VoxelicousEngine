@@ -26,7 +26,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
 	include "submodules/premake"
-	include "VoxelicousEngine/submodules/GLFW"
+	include "VoxelicousEngine/submodules/glfw"
 	include "VoxelicousEngine/submodules/imgui"
 group ""
 

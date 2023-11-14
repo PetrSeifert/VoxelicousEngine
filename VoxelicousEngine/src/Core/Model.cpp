@@ -4,7 +4,7 @@
 //#define TINYOBJLOADER_IMPLEMENTATION
 //#include <tinyobjloader/tiny_obj_loader.h>
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
+#include <gtx/hash.hpp>
 
 #ifndef ENGINE_DIR
 #define ENGINE_DIR "../"

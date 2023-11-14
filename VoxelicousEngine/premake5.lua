@@ -5,18 +5,22 @@ project "VoxelicousEngine"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "src/**.h", "src/**.cpp" }
+   files 
+   { 
+        "src/**.h", 
+        "src/**.cpp",
+   }
 
    includedirs
    {
       "src",
 
       "submodules/imgui",
-      "submodules/glfw/include",
       "submodules/spdlog/include",
-
+       
       "%{IncludeDir.VulkanSDK}",
       "%{IncludeDir.glm}",
+      "%{IncludeDir.GLFW}",
    }
 
    links
