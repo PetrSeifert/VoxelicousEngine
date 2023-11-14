@@ -34,6 +34,8 @@ namespace VoxelicousEngine {
 		initInfo.Device = m_Device.GetDevice();
 		initInfo.DescriptorPool = m_GlobalPool.GetDescriptorPool();
 		initInfo.ImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
+		initInfo.Queue = m_Device.GetGraphicsQueue();
+		initInfo.MinImageCount = 2;
 
 		ImGui_ImplVulkan_Init(&initInfo, m_Renderer.GetSwapChainRenderPass());
 		VkCommandBuffer commandBuffer = m_Renderer.BeginFrame();

@@ -41,7 +41,7 @@ namespace VoxelicousEngine
 	void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)
 	{
 		m_VertexCount = static_cast<uint32_t>(vertices.size());
-		assert(vertexCount >= 3 && "Vertex count must be at least 3");
+		assert(m_VertexCount >= 3 && "Vertex count must be at least 3");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * m_VertexCount;
 		uint32_t vertexSize = sizeof(vertices[0]);
 
