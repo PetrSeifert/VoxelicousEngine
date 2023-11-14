@@ -17,9 +17,9 @@ project "Editor"
 	{
 		"%{wks.location}/VoxelicousEngine/submodules/spdlog/include",
 		"%{wks.location}/VoxelicousEngine/src",
-		"%{wks.location}/VoxelicousEngine/submodules",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.VulkanSDK}",
+		"%{IncludeDir.GLFW}",
 	}
 
 	links

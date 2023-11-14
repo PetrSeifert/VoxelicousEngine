@@ -4,3 +4,9 @@
 [submodule "VoxelicousEngine/submodules/glm"]
 	path = VoxelicousEngine/submodules/glm
 	url = https://github.com/g-truc/glm
+[submodule "VoxelicousEngine/submodules/glfw"]
+	path = VoxelicousEngine/submodules/glfw
+	url = https://github.com/PetrSeifert/glfw
+[submodule "VoxelicousEngine/submodules/imgui"]
+	path = VoxelicousEngine/submodules/imgui
+	url = https://github.com/PetrSeifert/imgui

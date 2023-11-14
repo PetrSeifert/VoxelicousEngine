@@ -8,3 +8,4 @@ VoxelicousEngine/submodules/VulkanSDK
 *.vcxproj.filters
 *.vcxproj
 *.sln
+Editor/imgui.ini
