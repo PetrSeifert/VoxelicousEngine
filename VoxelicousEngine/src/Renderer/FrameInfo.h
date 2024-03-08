@@ -7,13 +7,13 @@
 
 namespace VoxelicousEngine
 {
-	struct FrameInfo
-	{
-		int frameIndex;
-		float frameTime;
-		VkCommandBuffer commandBuffer;
-		Camera& camera;
-		VkDescriptorSet globalDescriptorSet;
-		GameObject::Map& gameObjects;
-	};
+    struct FrameInfo
+    {
+        int FrameIndex;
+        float FrameTime;
+        VkCommandBuffer CommandBuffer;
+        Camera& Camera;
+        VkDescriptorSet GlobalDescriptorSet;
+        GameObject::Map& GameObjects;
+    };
 }

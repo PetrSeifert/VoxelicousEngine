@@ -4,102 +4,106 @@
 
 namespace VoxelicousEngine
 {
-	class DescriptorSetLayout
-	{
-	public:
-		class Builder
-		{
-		public:
-			explicit Builder(Device& Device) : m_Device{ Device } {}
+    class DescriptorSetLayout
+    {
+    public:
+        class Builder
+        {
+        public:
+            explicit Builder(Device& device) : m_Device{device}
+            {
+            }
 
-			Builder& AddBinding(
-				uint32_t binding,
-				VkDescriptorType descriptorType,
-				VkShaderStageFlags stageFlags,
-				uint32_t count = 1);
+            Builder& AddBinding(
+                uint32_t binding,
+                VkDescriptorType descriptorType,
+                VkShaderStageFlags stageFlags,
+                uint32_t count = 1);
 
-			std::unique_ptr<DescriptorSetLayout> Build() const;
+            std::unique_ptr<DescriptorSetLayout> Build() const;
 
-		private:
-			Device& m_Device;
-			std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> m_Bindings{};
-		};
+        private:
+            Device& m_Device;
+            std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> m_Bindings{};
+        };
 
-		DescriptorSetLayout(
-			Device& Device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
-		~DescriptorSetLayout();
-		DescriptorSetLayout(const DescriptorSetLayout&) = delete;
-		DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
+        DescriptorSetLayout(
+            Device& device, const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding>& bindings);
+        ~DescriptorSetLayout();
+        DescriptorSetLayout(const DescriptorSetLayout&) = delete;
+        DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
 
-		VkDescriptorSetLayout GetDescriptorSetLayout() const { return m_DescriptorSetLayout; }
+        VkDescriptorSetLayout GetDescriptorSetLayout() const { return m_DescriptorSetLayout; }
 
-	private:
-		Device& m_Device;
-		VkDescriptorSetLayout m_DescriptorSetLayout;
-		std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> m_Bindings;
+    private:
+        Device& m_Device;
+        VkDescriptorSetLayout m_DescriptorSetLayout;
+        std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> m_Bindings;
 
-		friend class DescriptorWriter;
-	};
+        friend class DescriptorWriter;
+    };
 
-	class DescriptorPool
-	{
-	public:
-		class Builder
-		{
-		public:
-			inline explicit Builder(Device& Device) : m_Device{ Device } {}
+    class DescriptorPool
+    {
+    public:
+        class Builder
+        {
+        public:
+            explicit Builder(Device& device) : m_Device{device}
+            {
+            }
 
-			Builder& AddPoolSize(VkDescriptorType descriptorType, uint32_t count);
-			Builder& SetPoolFlags(VkDescriptorPoolCreateFlags flags);
-			Builder& SetMaxSets(uint32_t count);
-			std::unique_ptr<DescriptorPool> Build() const;
+            Builder& AddPoolSize(VkDescriptorType descriptorType, uint32_t count);
+            Builder& SetPoolFlags(VkDescriptorPoolCreateFlags flags);
+            Builder& SetMaxSets(uint32_t count);
+            std::unique_ptr<DescriptorPool> Build() const;
 
-		private:
-			Device& m_Device;
-			std::vector<VkDescriptorPoolSize> m_PoolSizes{};
-			uint32_t m_MaxSets{ 1000 };
-			VkDescriptorPoolCreateFlags m_PoolFlags{ 0 };
-		};
+        private:
+            Device& m_Device;
+            std::vector<VkDescriptorPoolSize> m_PoolSizes{};
+            uint32_t m_MaxSets{1000};
+            VkDescriptorPoolCreateFlags m_PoolFlags{0};
+        };
 
-		DescriptorPool(
-			Device& Device,
-			uint32_t maxSets,
-			VkDescriptorPoolCreateFlags poolFlags,
-			const std::vector<VkDescriptorPoolSize>& poolSizes);
-		~DescriptorPool();
-		DescriptorPool(const DescriptorPool&) = delete;
-		DescriptorPool& operator=(const DescriptorPool&) = delete;
+        DescriptorPool(
+            Device& device,
+            uint32_t maxSets,
+            VkDescriptorPoolCreateFlags poolFlags,
+            const std::vector<VkDescriptorPoolSize>& poolSizes);
+        ~DescriptorPool();
+        DescriptorPool(const DescriptorPool&) = delete;
+        DescriptorPool& operator=(const DescriptorPool&) = delete;
 
-		bool AllocateDescriptor(
-			const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
+        bool AllocateDescriptor(
+            VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
 
-		void FreeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
+        void FreeDescriptors(const std::vector<VkDescriptorSet>& descriptors) const;
 
-		void ResetPool();
+        void ResetPool() const;
 
-		inline VkDescriptorPool GetDescriptorPool() const { return m_DescriptorPool; }
+        VkDescriptorPool GetDescriptorPool() const { return m_DescriptorPool; }
 
-	private:
-		Device& m_Device;
-		VkDescriptorPool m_DescriptorPool;
+    private:
+        Device& m_Device;
+        VkDescriptorPool m_DescriptorPool;
 
-		friend class DescriptorWriter;
-	};
+        friend class DescriptorWriter;
+    };
 
-	class DescriptorWriter
-	{
-	public:
-		DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPool& pool);
+    class DescriptorWriter
+    {
+    public:
+        DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPool& pool);
 
-		DescriptorWriter& WriteBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
-		DescriptorWriter& WriteImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
+        DescriptorWriter& WriteBuffer(uint32_t binding, const VkDescriptorBufferInfo* bufferInfo);
+        DescriptorWriter& WriteImage(uint32_t binding, const VkDescriptorImageInfo* imageInfo);
 
-		bool Build(VkDescriptorSet& set);
-		void Overwrite(VkDescriptorSet& set);
+        bool Build(VkDescriptorSet& set);
+        void Overwrite(const VkDescriptorSet& set);
 
-	private:
-		DescriptorSetLayout& m_SetLayout;
-		DescriptorPool& m_Pool;
-		std::vector<VkWriteDescriptorSet> m_Writes;
-	};
+    private:
+        DescriptorSetLayout& m_SetLayout;
+        DescriptorPool& m_Pool;
+        std::vector<VkWriteDescriptorSet> m_Writes;
+    };
 }

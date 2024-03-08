@@ -1,23 +1,23 @@
 #pragma once
 
-#include "Core.h"
 #include "spdlog/spdlog.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "spdlog/fmt/ostr.h"
 
-namespace VoxelicousEngine 
+namespace VoxelicousEngine
 {
-	class Log
-	{
-	public:
-		static void Init();
+    class Log
+    {
+    public:
+        static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
-		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
-	private:
-		static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-	};
+        static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_CoreLogger; }
+        static std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_ClientLogger; }
 
+    private:
+        static std::shared_ptr<spdlog::logger> m_CoreLogger;
+        static std::shared_ptr<spdlog::logger> m_ClientLogger;
+    };
 }
 
 // Core log macros
@@ -32,4 +32,4 @@ namespace VoxelicousEngine
 #define VE_INFO(...)	      ::VoxelicousEngine::Log::GetClientLogger()->info(__VA_ARGS__)
 #define VE_WARN(...)	      ::VoxelicousEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define VE_ERROR(...)	      ::VoxelicousEngine::Log::GetClientLogger()->error(__VA_ARGS__)
-#define VE_FATAL(...)    ::VoxelicousEngine::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define VE_FATAL(...)         ::VoxelicousEngine::Log::GetCoreLogger()->critical(__VA_ARGS__)

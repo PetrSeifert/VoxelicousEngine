@@ -4,9 +4,9 @@
 #pragma once
 
 #include "Core/App.h"
+#include "Core/EntryPoint.h"
 #include "Core/Layer.h"
 #include "ImGui/ImGuiLayer.h"
 #include "Renderer/DefaultLayer.h"
-#include "Core/EntryPoint.h"
 
-// TODO: Reference additional headers your program requires here.
+// TODO(Petr Seifert): Reference additional headers your program requires here.

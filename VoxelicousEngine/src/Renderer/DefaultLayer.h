@@ -12,41 +12,44 @@
 
 namespace VoxelicousEngine
 {
-	class DefaultLayer : public Layer
-	{
-	public:
-		explicit DefaultLayer(Renderer& renderer, Device& device, DescriptorPool& globalPool);
-		~DefaultLayer() final;
+    class DefaultLayer final : public Layer
+    {
+    public:
+        explicit DefaultLayer(Renderer& renderer, Device& device, DescriptorPool& globalPool);
+        ~DefaultLayer() override;
 
-		void OnAttach() final;
-		void OnDetach() final;
-		void OnUpdate(VkCommandBuffer commandBuffer) final;
-		void OnEvent(Event& event) final;
-	private:
-		Renderer& m_Renderer;
-		Device& m_Device;
-		DescriptorPool& m_GlobalPool;
-		Window& m_Window = App::Get().GetWindow();
-		GameObject viewerObject = GameObject::CreateGameObject();
-		Camera camera{};
-		KeyboardCameraController cameraController;
+        void OnAttach() override;
+        void OnDetach() override;
+        void OnUpdate(VkCommandBuffer commandBuffer) override;
+        void OnEvent(Event& event) override;
 
-		std::chrono::steady_clock::time_point m_CurrentTime;
-		
+    private:
+        Renderer& m_Renderer;
+        Device& m_Device;
+        DescriptorPool& m_GlobalPool;
+        Window& m_Window = App::Get().GetWindow();
+        GameObject m_ViewerObject = GameObject::CreateGameObject();
+        Camera m_Camera{};
+        KeyboardCameraController m_CameraController;
 
-		std::vector<std::unique_ptr<Buffer>> m_UboBuffers;
-		std::vector<VkDescriptorSet> m_GlobalDescriptorSets;
+        std::chrono::steady_clock::time_point m_CurrentTime;
 
-		std::unique_ptr<DescriptorSetLayout> m_GlobalSetLayout = DescriptorSetLayout::Builder(m_Device)
-			.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-			.Build();
-		
-		SimpleRenderSystem m_SimpleRendererSystem{
-			m_Device,
-			m_Renderer.GetSwapChainRenderPass(),
-			m_GlobalSetLayout->GetDescriptorSetLayout()
-		};
 
-		GameObject::Map m_GameObjects;
-	};
+        std::vector<std::unique_ptr<Buffer>> m_UboBuffers;
+        std::vector<VkDescriptorSet> m_GlobalDescriptorSets;
+
+        std::unique_ptr<DescriptorSetLayout> m_GlobalSetLayout = DescriptorSetLayout::Builder(m_Device)
+                                                                 .AddBinding(
+                                                                     0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                                                     VK_SHADER_STAGE_ALL_GRAPHICS)
+                                                                 .Build();
+
+        SimpleRenderSystem m_SimpleRendererSystem{
+            m_Device,
+            m_Renderer.GetSwapChainRenderPass(),
+            m_GlobalSetLayout->GetDescriptorSetLayout()
+        };
+
+        GameObject::Map m_GameObjects;
+    };
 }

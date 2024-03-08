@@ -4,35 +4,35 @@
 
 namespace VoxelicousEngine
 {
-	class Instance
-	{
+    class Instance
+    {
 #ifdef NDEBUG
-		const bool enableValidationLayers = true;
+        const bool m_EnableValidationLayers = true;
 #else
-		const bool enableValidationLayers = false;
+		const bool m_EnableValidationLayers = false;
 #endif
 
-	public:
-		Instance();
+    public:
+        Instance();
 
-		~Instance();
+        ~Instance();
 
-		inline VkInstance Get() { return m_Instance; }
+        VkInstance Get() const { return m_Instance; }
 
-	private:
-		void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) const;
+    private:
+        static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
-		void SetupDebugMessenger();
+        void SetupDebugMessenger();
 
-		bool CheckValidationLayerSupport();
+        bool CheckValidationLayerSupport() const;
 
-		void HasGlfwRequiredInstanceExtensions();
+        void HasGlfwRequiredInstanceExtensions() const;
 
-		std::vector<const char*> GetRequiredExtensions();
+        std::vector<const char*> GetRequiredExtensions() const;
 
-		VkInstance m_Instance;
-		VkDebugUtilsMessengerEXT m_DebugMessenger;
+        VkInstance m_Instance;
+        VkDebugUtilsMessengerEXT m_DebugMessenger;
 
-		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-	};
+        std::vector<const char*> m_ValidationLayers = {"VK_LAYER_KHRONOS_validation"};
+    };
 }

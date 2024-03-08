@@ -6,32 +6,33 @@
 #include "Renderer/Descriptors.h"
 #include "Core/App.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Camera.h"
-#include "Renderer/SimpleRenderSystem.h"
 #include "Core/KeyboardCameraController.h"
 
-namespace VoxelicousEngine 
+namespace VoxelicousEngine
 {
-	class ImGuiLayer : public Layer
-	{
-	public:
-		ImGuiLayer(Renderer& renderer, Device& device, DescriptorPool& globalPool);
-		~ImGuiLayer() final;
+    class ImGuiLayer final : public Layer
+    {
+    public:
+        ImGuiLayer(Renderer& renderer, Device& device, DescriptorPool& globalPool);
+        ~ImGuiLayer() override;
 
-		void OnAttach() final;
-		void OnDetach() final;
-		void OnUpdate(VkCommandBuffer commandBuffer) final;
-		void OnEvent(Event& event) final;
-	private:
-		Renderer& m_Renderer;
-		Device& m_Device;
-		DescriptorPool& m_GlobalPool;
-		Window& m_Window = App::Get().GetWindow();
+        void OnAttach() override;
+        void OnDetach() override;
+        void OnUpdate(VkCommandBuffer commandBuffer) override;
+        void OnEvent(Event& event) override;
 
-		std::chrono::steady_clock::time_point m_CurrentTime;
+    private:
+        Renderer& m_Renderer;
+        Device& m_Device;
+        DescriptorPool& m_GlobalPool;
+        Window& m_Window = App::Get().GetWindow();
 
-		std::unique_ptr<DescriptorSetLayout> m_GlobalSetLayout = DescriptorSetLayout::Builder(m_Device)
-			.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-			.Build();
-	};
+        std::chrono::steady_clock::time_point m_CurrentTime;
+
+        std::unique_ptr<DescriptorSetLayout> m_GlobalSetLayout = DescriptorSetLayout::Builder(m_Device)
+                                                                 .AddBinding(
+                                                                     0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                                                     VK_SHADER_STAGE_ALL_GRAPHICS)
+                                                                 .Build();
+    };
 }

@@ -1,15 +1,13 @@
 #include "vepch.h"
 #include "Layer.h"
 
-namespace VoxelicousEngine 
+namespace VoxelicousEngine
 {
-	Layer::Layer(const std::string& debugName)
-		: m_DebugName(debugName)
-	{
-	}
+    Layer::Layer(std::string name)
+        : m_DebugName(std::move(name))
+    {
+    }
 
-	Layer::~Layer()
-	{
-
-	}
+    Layer::~Layer()
+    = default;
 }

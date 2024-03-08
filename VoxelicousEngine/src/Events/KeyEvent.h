@@ -3,57 +3,63 @@
 #include "Event.h"
 
 
-namespace VoxelicousEngine 
+namespace VoxelicousEngine
 {
-	class KeyEvent : public Event
-	{
-	public:
-		inline int GetKeyCode() const { return m_KeyCode; }
+    class KeyEvent : public Event
+    {
+    public:
+        int GetKeyCode() const { return m_KeyCode; }
 
-		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
+        EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
-	protected:
-		explicit KeyEvent(int keycode)
-			: m_KeyCode(keycode) {}
+    protected:
+        explicit KeyEvent(const int keycode)
+            : m_KeyCode(keycode)
+        {
+        }
 
-	private:
-		int m_KeyCode;
-	};
+    private:
+        int m_KeyCode;
+    };
 
-	class KeyPressedEvent : public KeyEvent
-	{
-	public:
-		KeyPressedEvent(int keycode, int repeatCount)
-			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+    class KeyPressedEvent final : public KeyEvent
+    {
+    public:
+        KeyPressedEvent(const int keycode, const int repeatCount)
+            : KeyEvent(keycode), m_RepeatCount(repeatCount)
+        {
+        }
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+        int GetRepeatCount() const { return m_RepeatCount; }
 
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "KeyPressedEvent: " << GetKeyCode() << " (" << m_RepeatCount << " repeats)";
-			return ss.str();
-		}
+        std::string ToString() const override
+        {
+            std::stringstream ss;
+            ss << "KeyPressedEvent: " << GetKeyCode() << " (" << m_RepeatCount << " repeats)";
+            return ss.str();
+        }
 
-		EVENT_CLASS_TYPE(KeyPressed)
+        EVENT_CLASS_TYPE(KeyPressed)
 
-	private:
-		int m_RepeatCount;
-	};
+    private:
+        int m_RepeatCount;
+    };
 
-	class KeyReleasedEvent : public KeyEvent
-	{
-	public:
-		explicit KeyReleasedEvent(int keycode)
-			: KeyEvent(keycode) {}
+    class KeyReleasedEvent final : public KeyEvent
+    {
+    public:
+        explicit KeyReleasedEvent(const int keycode)
+            : KeyEvent(keycode)
+        {
+        }
 
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "KeyReleasedEvent: " << GetKeyCode();
-			return ss.str();
-		}
+        std::string ToString() const override
+        {
+            std::stringstream ss;
+            ss << "KeyReleasedEvent: " << GetKeyCode();
+            return ss.str();
+        }
 
-		EVENT_CLASS_TYPE(KeyReleased)
-	};
+        EVENT_CLASS_TYPE(KeyReleased)
+    };
 }
