@@ -1,47 +1,54 @@
 project "Editor"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++20"
-	staticruntime "off"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++20"
+    staticruntime "off"
 
-	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+    targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+	debugdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 
 	files
-	{
-		"src/**.h",
-		"src/**.cpp"
-	}
+    {
+        "src/**.h",
+        "src/**.cpp",
+		"shaders/**.vert",
+		"shaders/**.frag"
+    }
 
-	includedirs
-	{
-		"%{wks.location}/VoxelicousEngine/submodules/spdlog/include",
-		"%{wks.location}/VoxelicousEngine/src",
-		"%{IncludeDir.glm}",
-		"%{IncludeDir.VulkanSDK}",
-		"%{IncludeDir.GLFW}",
-	}
+    includedirs
+    {
+        "%{wks.location}/VoxelicousEngine/submodules/spdlog/include",
+        "%{wks.location}/VoxelicousEngine/src",
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.GLFW}",
+    }
 
-	links
-	{
-		"VoxelicousEngine"
-	}
+    links
+    {
+        "VoxelicousEngine",
+    }
 
-	filter "system:windows"
-		systemversion "latest"
-		defines { "VE_PLATFORM_WINDOWS" }
+    -- Windows-specific settings
+    filter "system:windows"
+        systemversion "latest"
+        defines { "VE_PLATFORM_WINDOWS" }
 
-	filter "configurations:Debug"
-		defines "VE_DEBUG"
-		runtime "Debug"
-		symbols "on"
+    -- Debug configuration settings
+    filter "configurations:Debug"
+        defines "VE_DEBUG"
+        runtime "Debug"
+        symbols "on"
 
-	filter "configurations:Release"
-		defines "VE_RELEASE"
-		runtime "Release"
-		optimize "on"
+    -- Release configuration settings
+    filter "configurations:Release"
+        defines "VE_RELEASE"
+        runtime "Release"
+        optimize "on"
 
-	filter "configurations:Dist"
-		defines "VE_DIST"
-		runtime "Release"
-		optimize "on"
+    -- Distribution configuration settings
+    filter "configurations:Dist"
+        defines "VE_DIST"
+        runtime "Release"
+        optimize "on"

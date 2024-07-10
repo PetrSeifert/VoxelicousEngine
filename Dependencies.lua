@@ -1,4 +1,3 @@
-
 -- VoxelicousEngine Dependencies
 
 VULKAN_SDK = os.getenv("VULKAN_SDK")

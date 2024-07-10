@@ -2,7 +2,6 @@ project "VoxelicousEngine"
    kind "StaticLib"
    language "C++"
    cppdialect "C++20"
-   targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
    files 
@@ -25,14 +24,14 @@ project "VoxelicousEngine"
 
    links
    {
-       "ImGui",
-       "GLFW",
-
-       "%{Library.Vulkan}",
+      "ImGui",
+      "GLFW",
+      "%{Library.Vulkan}",
    }
 
-   targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
+   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+   debugdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
    defines { "VE_BUILD_DLL"}
 
    filter "system:windows"

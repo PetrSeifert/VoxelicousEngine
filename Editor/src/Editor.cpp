@@ -1,6 +1,6 @@
 #include <VoxelicousEngine.h>
 
-const VoxelicousEngine::Model::Builder sprite = { {
+const VoxelicousEngine::Model::Builder CUBE = { {
 	{ {-1, 0, -1}, {.0f, 1.0f, .0f} },
 	{ {-1, 0, -1}, {0.0f, 1.0f, 0.0f} },
 	{ {1, 0, -1}, {0.0f, 1.0f, 0.0f} },
@@ -26,62 +26,11 @@ struct GlobalUbo
 	alignas(16) glm::vec4 LightColor{ 1.f };
 };
 
-class ExampleLayer final : public VoxelicousEngine::Layer
-{
-public:
-	ExampleLayer()
-		: Layer("Example")
-	{
-	}
-
-	/*void OnAttach() override
-	{
-		m_UboBuffers = std::vector<std::unique_ptr<Buffer>>(SwapChain::MAX_FRAMES_IN_FLIGHT);
-		for (auto& m_UboBuffer : m_UboBuffers)
-		{
-			m_UboBuffer = std::make_unique<Buffer>(
-				m_Device,
-				sizeof(GlobalUbo),
-				1,
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-			);
-			m_UboBuffer->Map();
-		}
-
-		m_GlobalDescriptorSets = std::vector<VkDescriptorSet>(SwapChain::MAX_FRAMES_IN_FLIGHT);
-		for (size_t i = 0; i < m_GlobalDescriptorSets.size(); i++) {
-			auto bufferInfo = m_UboBuffers[i]->DescriptorInfo();
-			DescriptorWriter(*m_GlobalSetLayout, m_GlobalPool)
-				.WriteBuffer(0, &bufferInfo)
-				.Build(m_GlobalDescriptorSets[i]);
-		}
-
-		auto myModel = std::make_shared<Model>(m_Device, voxel);
-
-		auto gameObj = GameObject::CreateGameObject();
-		gameObj.model = myModel;
-		gameObj.transform.translation = { 0, 0, 0 };
-		m_GameObjects.emplace(gameObj.getId(), std::move(gameObj));
-	}*/
-
-	void OnUpdate(VkCommandBuffer commandBuffer) override
-	{
-		VE_INFO("ExampleLayer::Update");
-	}
-
-	void OnEvent(VoxelicousEngine::Event& event) override
-	{
-		VE_TRACE("{0}", event);
-	}
-};
-
 class FirstApp : public VoxelicousEngine::App
 {
 public:
 	FirstApp()
 	{
-		//PushLayer(new ExampleLayer());
 		PushLayer(new VoxelicousEngine::ImGuiLayer(*m_Renderer, *m_Device, *m_GlobalPool));
 		PushLayer(new VoxelicousEngine::DefaultLayer(*m_Renderer, *m_Device, *m_GlobalPool));
 	}

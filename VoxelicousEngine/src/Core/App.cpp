@@ -3,8 +3,9 @@
 
 #include "Log.h"
 #include "Renderer/SwapChain.h"
+#include "GLFW/glfw3.h"
 
-#include <GLFW/glfw3.h>
+#include <filesystem>
 
 namespace VoxelicousEngine
 {
@@ -19,6 +20,7 @@ namespace VoxelicousEngine
 
     App::App()
     {
+        VE_CORE_INFO("Started app!");
         VE_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
@@ -73,7 +75,6 @@ namespace VoxelicousEngine
                 break;
         }
     }
-
 
     void App::Run()
     {

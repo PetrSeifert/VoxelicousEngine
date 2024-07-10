@@ -67,11 +67,23 @@ namespace VoxelicousEngine
         }
 
         const auto myModel = std::make_shared<Model>(m_Device, VOXEL);
+        const auto myModel1 = std::make_shared<Model>(m_Device, VOXEL);
+        const auto myModel2 = std::make_shared<Model>(m_Device, VOXEL);
 
         auto gameObj = GameObject::CreateGameObject();
         gameObj.Model = myModel;
         gameObj.Transform.Translation = {0, 0, 0};
         m_GameObjects.emplace(gameObj.GetId(), std::move(gameObj));
+
+        auto gameObj1 = GameObject::CreateGameObject();
+        gameObj1.Model = myModel1;
+        gameObj1.Transform.Translation = {1, 0, 0};
+        m_GameObjects.emplace(gameObj1.GetId(), std::move(gameObj1));
+
+        auto gameObj2 = GameObject::CreateGameObject();
+        gameObj2.Model = myModel2;
+        gameObj2.Transform.Translation = {2, 0, 0};
+        m_GameObjects.emplace(gameObj2.GetId(), std::move(gameObj2));
     }
 
     void DefaultLayer::OnDetach()
