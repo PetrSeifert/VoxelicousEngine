@@ -1,6 +1,8 @@
 #include "vepch.h"
 #include "App.h"
 
+#include <common.hpp>
+
 #include "Log.h"
 #include "Renderer/SwapChain.h"
 #include "GLFW/glfw3.h"
@@ -90,16 +92,29 @@ namespace VoxelicousEngine
 
         while (m_Running)
         {
-            if (const VkCommandBuffer commandBuffer = m_Renderer->BeginFrame())
-            {
-                m_Renderer->BeginSwapChainRendererPass(commandBuffer);
-                for (Layer* layer : m_LayerStack)
-                    layer->OnUpdate(commandBuffer);
-                m_Renderer->EndSwapChainRendererPass(commandBuffer);
-                m_Renderer->EndFrame();
+			static uint64_t frameCounter = 0;
 
-                m_Window->OnUpdate();
+            if (!m_Minimized)
+            {
+                if (const VkCommandBuffer commandBuffer = m_Renderer->BeginFrame())
+                {
+                    m_Renderer->BeginSwapChainRendererPass(commandBuffer);
+                    for (Layer* layer : m_LayerStack)
+                        layer->OnUpdate(m_TimeStep);
+                    m_Renderer->EndSwapChainRendererPass(commandBuffer);
+                    m_Renderer->EndFrame();
+
+                    m_Window->OnUpdate();
+                }
             }
+
+            float time = GetTime();
+            m_FrameTime = time - m_LastFrameTime;
+            m_TimeStep = glm::min<float>(m_FrameTime, 0.0333f);
+            m_LastFrameTime = time;
+
+            //HZ_CORE_INFO("-- END FRAME {0}", frameCounter);
+            frameCounter++;
         }
     }
 

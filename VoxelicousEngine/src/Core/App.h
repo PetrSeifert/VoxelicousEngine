@@ -29,17 +29,29 @@ namespace VoxelicousEngine
         Instance& GetInstance() const { return *m_Instance; }
 
         static App& Get() { return *s_Instance; }
+        
+        TimeStep GetTimeStep() const { return m_TimeStep; }
+        TimeStep GetFrameTime() const { return m_FrameTime; }
+		float GetTime() const; // TODO: This should be in "Platform"
 
     protected:
         bool OnWindowClose(const WindowCloseEvent& e);
 
         std::unique_ptr<Instance> m_Instance;
-        std::unique_ptr<Window> m_Window;
         std::unique_ptr<Device> m_Device;
         std::unique_ptr<DescriptorPool> m_GlobalPool;
         std::unique_ptr<Renderer> m_Renderer;
-        bool m_Running{true};
+
+    private:
+        std::unique_ptr<Window> m_Window;
+        bool m_Running = true;
+		bool m_Minimized = false;
         LayerStack m_LayerStack;
+        TimeStep m_FrameTime;
+        TimeStep m_TimeStep;
+        
+        float m_LastFrameTime = 0.0f;
+        uint32_t m_CurrentFrameIndex = 0;
 
         static App* s_Instance;
     };

@@ -7,7 +7,4 @@ namespace VoxelicousEngine
         : m_DebugName(std::move(name))
     {
     }
-
-    Layer::~Layer()
-    = default;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vulkan/vulkan.h"
 #include "Events/Event.h"
+#include "Core/TimeStep.h"
 
 namespace VoxelicousEngine
 {
@@ -9,23 +9,13 @@ namespace VoxelicousEngine
     {
     public:
         explicit Layer(std::string name = "Layer");
-        virtual ~Layer();
+        virtual ~Layer() = default;
 
-        virtual void OnAttach()
-        {
-        }
-
-        virtual void OnDetach()
-        {
-        }
-
-        virtual void OnUpdate(VkCommandBuffer commandBuffer)
-        {
-        }
-
-        virtual void OnEvent(Event& event)
-        {
-        }
+        virtual void OnAttach(){}
+        virtual void OnDetach(){}
+        virtual void OnUpdate(TimeStep ts){}
+		virtual void OnImGuiRender() {}
+        virtual void OnEvent(Event& event){}
 
         const std::string& GetName() const { return m_DebugName; }
 
