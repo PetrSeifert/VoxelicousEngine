@@ -13,7 +13,7 @@ namespace VoxelicousEngine
         const VkShaderStageFlags stageFlags,
         const uint32_t count)
     {
-        assert(m_Bindings.count(binding) == 0 && "Binding already in use");
+        assert(!m_Bindings.contains(binding) && "Binding already in use");
         VkDescriptorSetLayoutBinding layoutBinding{};
         layoutBinding.binding = binding;
         layoutBinding.descriptorType = descriptorType;

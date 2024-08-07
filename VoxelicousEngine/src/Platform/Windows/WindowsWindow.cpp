@@ -8,12 +8,12 @@
 
 namespace VoxelicousEngine
 {
-    Window* Window::Create(Instance& instance, const WindowProps& props)
+    Window* Window::Create(Instance& instance, const WindowSpecification& props)
     {
         return new WindowsWindow(instance, props);
     }
 
-    WindowsWindow::WindowsWindow(Instance& instance, const WindowProps& props) : m_Instance(instance)
+    WindowsWindow::WindowsWindow(Instance& instance, const WindowSpecification& props) : m_Instance(instance)
     {
         m_Data.Title = props.Title;
         m_Data.Width = props.Width;

@@ -7,7 +7,7 @@ namespace VoxelicousEngine
     class WindowsWindow final : public Window
     {
     public:
-        explicit WindowsWindow(Instance& instance, const WindowProps& props);
+        explicit WindowsWindow(Instance& instance, const WindowSpecification& props);
         ~WindowsWindow() override;
 
         void OnUpdate() override;

@@ -30,7 +30,6 @@ namespace VoxelicousEngine
     }
 
     std::vector<char> Pipeline::ReadFile(const std::string& filePath)
-
     {
         const std::string enginePath = ENGINE_DIR + filePath;
         std::ifstream file(enginePath, std::ios::ate | std::ios::binary);

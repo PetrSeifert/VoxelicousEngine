@@ -7,35 +7,48 @@
 
 namespace VoxelicousEngine
 {
-    /*struct GlobalUbo {
-        glm::mat4 projection{ 1.f };
-        glm::mat4 view{ 1.f };
-        glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, .02f };
-        glm::vec3 lightPosition{ -5.f, -6.f, 0.f };
-        alignas(16) glm::vec4 lightColor{ 1.f };
-    };*/
-
-    ImGuiLayer::ImGuiLayer(Renderer& renderer, Device& device, DescriptorPool& globalPool) : Layer("ImGuiLayer"),
-        m_Renderer(renderer), m_Device(device), m_GlobalPool(globalPool)
+    ImGuiLayer::ImGuiLayer()
+        : Layer("ImGuiLayer")
     {
     }
 
-    ImGuiLayer::~ImGuiLayer() = default;
-
     void ImGuiLayer::OnAttach()
     {
+        IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+        
         ImGui::StyleColorsDark();
 
-        ImGui_ImplGlfw_InitForVulkan(m_Window.GetGLFW_Window(), true);
-        const App& app = App::Get();
+        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        ImGuiStyle& style = ImGui::GetStyle();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+    
+        SetDarkThemeColors();
+
+        App& app = App::Get();
+        GLFWwindow* window = app.GetWindow().GetGLFW_Window();
+        Device& device = app.GetDevice();
+        DescriptorPool &globalPool = app.;
+        
+        ImGui_ImplGlfw_InitForVulkan(window, true);
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = app.GetInstance().Get();
-        initInfo.PhysicalDevice = m_Device.GetPhysicalDevice();
-        initInfo.Device = m_Device.GetDevice();
+        initInfo.PhysicalDevice = device.GetPhysicalDevice();
+        initInfo.Device = device.GetDevice();
         initInfo.DescriptorPool = m_GlobalPool.GetDescriptorPool();
         initInfo.ImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
-        initInfo.Queue = m_Device.GetGraphicsQueue();
+        initInfo.Queue = device.GetGraphicsQueue();
         initInfo.MinImageCount = 2;
 
         ImGui_ImplVulkan_Init(&initInfo, m_Renderer.GetSwapChainRenderPass());
