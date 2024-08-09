@@ -108,7 +108,7 @@ namespace VoxelicousEngine
                 }
             }
 
-            float time = GetTime();
+            const float time = GetTime();
             m_FrameTime = time - m_LastFrameTime;
             m_TimeStep = glm::min<float>(m_FrameTime, 0.0333f);
             m_LastFrameTime = time;
