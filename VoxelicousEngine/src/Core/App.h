@@ -32,6 +32,7 @@ namespace VoxelicousEngine
 
     protected:
         bool OnWindowClose(const WindowCloseEvent& e);
+        void TimerHandler(int sig);
 
         std::unique_ptr<Instance> m_Instance;
         std::unique_ptr<Window> m_Window;

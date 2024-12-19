@@ -1,3 +1,5 @@
+#define GLFW_EXPOSE_NATIVE_WIN32
+
 #include "vepch.h"
 #include "WindowsWindow.h"
 
@@ -5,6 +7,7 @@
 #include "Events/AppEvent.h"
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
+#include "GLFW/glfw3native.h"
 
 namespace VoxelicousEngine
 {
@@ -142,4 +145,11 @@ namespace VoxelicousEngine
     {
         return m_Data.VSync;
     }
+
+    void WindowsWindow::SetWindowStyle()
+    {
+        HWND hwnd = glfwGetWin32Window(m_Window);
+        SetWindowLongA(hwnd, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT);
+    }
+
 }

@@ -1,9 +1,14 @@
 #include "vepch.h"
 #include "App.h"
 
+#include <csignal>
+#include <thread>
+#include <chrono>
+
 #include "Log.h"
 #include "Renderer/SwapChain.h"
 #include "GLFW/glfw3.h"
+#include "UIAccess.h"
 
 #include <filesystem>
 
@@ -28,7 +33,6 @@ namespace VoxelicousEngine
         VE_CORE_ASSERT(success, "Could not intialize GLFW!");
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
         glfwSetErrorCallback(GLFWErrorCallback);
 
         m_Instance = std::make_unique<Instance>();
@@ -44,6 +48,13 @@ namespace VoxelicousEngine
                        .Build();
 
         m_Renderer = std::make_unique<Renderer>(*m_Window, *m_Device);
+
+        std::thread([this]
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            VE_INFO("Set window style");
+            m_Window->SetWindowStyle();
+        }).detach();
     }
 
     App::~App()

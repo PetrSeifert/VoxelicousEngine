@@ -42,6 +42,7 @@ namespace VoxelicousEngine
         virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
         virtual void SetVSync(bool enabled) = 0;
         virtual bool IsVSync() const = 0;
+        virtual void SetWindowStyle() = 0;
 
         static Window* Create(Instance& instance, const WindowProps& props = WindowProps());
     };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Window.h"
+#include "Windows.h"
 
 namespace VoxelicousEngine
 {
@@ -24,6 +25,7 @@ namespace VoxelicousEngine
         void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
         void SetVSync(bool enabled) override;
         bool IsVSync() const override;
+        void SetWindowStyle() override;
 
     private:
         GLFWwindow* m_Window{};
