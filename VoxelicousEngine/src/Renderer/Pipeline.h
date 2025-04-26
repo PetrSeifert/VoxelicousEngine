@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Device.h"
+#include "ShaderManager.h"
 
 namespace VoxelicousEngine
 {
@@ -43,16 +44,24 @@ namespace VoxelicousEngine
         void Bind(VkCommandBuffer commandBuffer) const;
 
         static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+        
+        // Static method to access the shared shader manager
+        static ShaderManager& GetShaderManager() 
+        { 
+            static ShaderManager s_ShaderManager;
+            return s_ShaderManager; 
+        }
 
     private:
-        static std::vector<char> ReadFile(const std::string& filePath);
+        // This replaces the old ReadFile method
+        std::vector<uint32_t> LoadShader(const std::string& filePath, ShaderType type);
 
         void CreateGraphicsPipeline(
             const std::string& vertFilepath,
             const std::string& fragFilepath,
             const PipelineConfigInfo& configInfo);
 
-        void CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) const;
+        void CreateShaderModule(const std::vector<uint32_t>& code, VkShaderModule* shaderModule) const;
 
         Device& m_Device;
         VkPipeline m_GraphicsPipeline;

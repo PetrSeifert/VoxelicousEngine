@@ -49,22 +49,30 @@ namespace VoxelicousEngine
 
     void SimpleRenderSystem::CreatePipeline(const VkRenderPass renderPass)
     {
-        VE_CORE_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
+        VE_CORE_ASSERT(m_PipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
 
         PipelineConfigInfo pipelineConfig{};
         Pipeline::DefaultPipelineConfigInfo(pipelineConfig);
         pipelineConfig.RenderPass = renderPass;
         pipelineConfig.PipelineLayout = m_PipelineLayout;
+        
+        // Use non-SPV shader files - the ShaderManager will compile them automatically
         m_Pipeline = std::make_unique<Pipeline>(
             m_Device,
-            "shaders/simple.vert.spv",
-            "shaders/simple.frag.spv",
+            "shaders/simple.vert",
+            "shaders/simple.frag",
             pipelineConfig
         );
+        
+        // Check for shader changes periodically
+        Pipeline::GetShaderManager().CheckForChanges();
     }
 
     void SimpleRenderSystem::RenderGameObjects(const FrameInfo& frameInfo) const
     {
+        // Check for shader changes before rendering
+        Pipeline::GetShaderManager().CheckForChanges();
+        
         m_Pipeline->Bind(frameInfo.CommandBuffer);
 
         vkCmdBindDescriptorSets(

@@ -23,33 +23,28 @@ std::string SpirvHelper::ReadFile(const std::string& filePath)
     return buffer;
 }
  
-std::vector<uint32_t> SpirvHelper::CompileShader(const std::string& filePath, const shaderc_shader_kind kind, const bool optimize)
+std::vector<uint32_t> SpirvHelper::LoadSpirvBinary(const std::string& filePath)
 {
-    const shaderc::Compiler compiler;
-    shaderc::CompileOptions options;
- 
-    options.AddMacroDefinition("MY_DEFINE", "1");
-    if(optimize)
-        options.SetOptimizationLevel(shaderc_optimization_level_size);
-
-    const std::string& source = ReadFile(filePath);
+    std::ifstream file(filePath, std::ios::ate | std::ios::binary);
     
-    // Extract filename without extension for shader module name
-    std::string filename = filePath;
-    const size_t lastSlash = filePath.find_last_of("/\\");
-    if (lastSlash != std::string::npos)
-        filename = filePath.substr(lastSlash + 1);
-    const size_t lastDot = filename.find_last_of('.');
-    if (lastDot != std::string::npos)
-        filename = filename.substr(0, lastDot);
-    
-    const shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, kind, filename.c_str(), options);
- 
-    if(module.GetCompilationStatus() != shaderc_compilation_status_success)
+    if(!file.is_open())
     {
-        std::cerr << module.GetErrorMessage();
+        VE_CORE_ERROR("Failed to open SPIR-V binary file: {}", filePath);
         return {};
     }
- 
-    return { module.cbegin(), module.cend() };
+    
+    const size_t fileSize = file.tellg();
+    if (fileSize % sizeof(uint32_t) != 0)
+    {
+        VE_CORE_ERROR("SPIR-V binary size is not a multiple of sizeof(uint32_t): {}", filePath);
+        return {};
+    }
+    
+    std::vector<uint32_t> spirvCode(fileSize / sizeof(uint32_t));
+    
+    file.seekg(0);
+    file.read(reinterpret_cast<char*>(spirvCode.data()), fileSize);
+    file.close();
+    
+    return spirvCode;
 }

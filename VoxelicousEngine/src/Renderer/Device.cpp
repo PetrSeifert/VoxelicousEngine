@@ -168,14 +168,20 @@ namespace VoxelicousEngine
                 indices.GraphicsFamily = i;
                 indices.GraphicsFamilyHasValue = true;
             }
-            VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
-            if (queueFamily.queueCount > 0 && presentSupport)
+            
+            if (surface != VK_NULL_HANDLE) 
             {
-                indices.PresentFamily = i;
-                indices.PresentFamilyHasValue = true;
+                VkBool32 presentSupport = false;
+                vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+                if (queueFamily.queueCount > 0 && presentSupport)
+                {
+                    indices.PresentFamily = i;
+                    indices.PresentFamilyHasValue = true;
+                }
             }
-            if (indices.IsComplete())
+            
+            if ((indices.GraphicsFamilyHasValue && surface == VK_NULL_HANDLE) || 
+                (indices.IsComplete() && surface != VK_NULL_HANDLE))
             {
                 break;
             }

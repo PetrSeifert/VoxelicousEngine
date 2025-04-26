@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Core/Log.h"
 #include "GLFW/glfw3.h"
+#include "Pipeline.h"
 
 namespace VoxelicousEngine
 {
@@ -75,6 +76,7 @@ namespace VoxelicousEngine
     VkCommandBuffer Renderer::BeginFrame()
     {
         VE_CORE_ASSERT(!m_IsFrameStarted && "Can't call beginFrame while already in progress!");
+        Pipeline::GetShaderManager().CheckForChanges();
 
         const auto result = m_SwapChain->AcquireNextImage(&m_CurrentImageIndex);
 

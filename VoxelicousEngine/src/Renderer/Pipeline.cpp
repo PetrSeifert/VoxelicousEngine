@@ -29,28 +29,11 @@ namespace VoxelicousEngine
         vkDestroyPipeline(m_Device.GetDevice(), m_GraphicsPipeline, nullptr);
     }
 
-    std::vector<char> Pipeline::ReadFile(const std::string& filePath)
-
+    std::vector<uint32_t> Pipeline::LoadShader(const std::string& filePath, ShaderType type)
     {
-        const std::string enginePath = ENGINE_DIR + filePath;
-        std::ifstream file(enginePath, std::ios::ate | std::ios::binary);
-        
-        if (!file.is_open())
-        {
-            std::cout << ENGINE_DIR << " " << filePath << '\n';
-            VE_CORE_ERROR("Failed to open file : " + enginePath);
-        }
-
-        const size_t fileSize = file.tellg();
-        std::vector<char> buffer(fileSize);
-
-        file.seekg(0);
-        file.read(buffer.data(), fileSize);
-        
-        file.close();
-        return buffer;
-
-    };
+        // Use the shader manager to load and potentially compile the shader
+        return GetShaderManager().LoadShader(filePath, type);
+    }
 
     void Pipeline::CreateGraphicsPipeline(
         const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& configInfo)
@@ -60,8 +43,15 @@ namespace VoxelicousEngine
         VE_CORE_ASSERT(configInfo.RenderPass != VK_NULL_HANDLE &&
             "Cannot create graphics pipeline: no renderPass provided in configInfo!");
 
-        const auto vertCode = ReadFile(vertFilepath);
-        const auto fragCode = ReadFile(fragFilepath);
+        // Load and potentially compile the shaders
+        const auto vertCode = LoadShader(vertFilepath, ShaderType::Vertex);
+        const auto fragCode = LoadShader(fragFilepath, ShaderType::Fragment);
+
+        if (vertCode.empty() || fragCode.empty())
+        {
+            VE_CORE_ERROR("Failed to load/compile shaders for pipeline");
+            return;
+        }
 
         CreateShaderModule(vertCode, &m_VertShaderModule);
         CreateShaderModule(fragCode, &m_FragShaderModule);
@@ -123,12 +113,12 @@ namespace VoxelicousEngine
         }
     }
 
-    void Pipeline::CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) const
+    void Pipeline::CreateShaderModule(const std::vector<uint32_t>& code, VkShaderModule* shaderModule) const
     {
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = code.size();
-        createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+        createInfo.codeSize = code.size() * sizeof(uint32_t);
+        createInfo.pCode = code.data();
 
         if (vkCreateShaderModule(m_Device.GetDevice(), &createInfo, nullptr, shaderModule) != VK_SUCCESS)
         {
@@ -213,5 +203,5 @@ namespace VoxelicousEngine
 
         configInfo.BindingDescriptions = Model::Vertex::GetBindingDescriptions();
         configInfo.AttributeDescriptions = Model::Vertex::GetAttributeDescriptions();
-    };
+    }
 }
