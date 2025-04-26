@@ -37,6 +37,8 @@ namespace VoxelicousEngine
         VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
         VkQueue GetPresentQueue() const { return m_PresentQueue; }
         VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
+        
+        uint32_t GetGraphicsQueueFamily() const;
 
         SwapChainSupportDetails GetSwapChainSupport(const VkSurfaceKHR surface) const
         {

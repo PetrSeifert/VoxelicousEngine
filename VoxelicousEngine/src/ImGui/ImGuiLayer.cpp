@@ -37,50 +37,14 @@ namespace VoxelicousEngine
         initInfo.ImageCount = SwapChain::MAX_FRAMES_IN_FLIGHT;
         initInfo.Queue = m_Device.GetGraphicsQueue();
         initInfo.MinImageCount = 2;
+        initInfo.QueueFamily = m_Device.GetGraphicsQueueFamily();
 
         ImGui_ImplVulkan_Init(&initInfo, m_Renderer.GetSwapChainRenderPass());
 
-        // Use a separate command buffer for font texture creation to avoid layout transition issues
-        VkCommandPool commandPool;
-        VkCommandPoolCreateInfo poolInfo = {};
-        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        vkCreateCommandPool(m_Device.GetDevice(), &poolInfo, nullptr, &commandPool);
-
-        // Allocate command buffer
-        VkCommandBuffer commandBuffer;
-        VkCommandBufferAllocateInfo allocInfo = {};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-        vkAllocateCommandBuffers(m_Device.GetDevice(), &allocInfo, &commandBuffer);
-
-        // Begin command buffer
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-        // Create font texture
+        // Use the device's helper method for one-time command buffer execution
+        VkCommandBuffer commandBuffer = m_Device.BeginSingleTimeCommands();
         ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-
-        // End command buffer
-        vkEndCommandBuffer(commandBuffer);
-
-        // Submit command buffer
-        VkSubmitInfo submitInfo = {};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffer;
-        vkQueueSubmit(m_Device.GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-
-        // Wait for completion
-        vkDeviceWaitIdle(m_Device.GetDevice());
-
-        // Cleanup
-        vkFreeCommandBuffers(m_Device.GetDevice(), commandPool, 1, &commandBuffer);
-        vkDestroyCommandPool(m_Device.GetDevice(), commandPool, nullptr);
+        m_Device.EndSingleTimeCommands(commandBuffer);
 
         ImGui_ImplVulkan_DestroyFontUploadObjects();
     }

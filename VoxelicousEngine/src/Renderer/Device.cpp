@@ -395,4 +395,11 @@ namespace VoxelicousEngine
             throw std::runtime_error("failed to bind image memory!");
         }
     }
+
+    uint32_t Device::GetGraphicsQueueFamily() const
+    {
+        // Get the graphics queue family index
+        QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice, VK_NULL_HANDLE);
+        return indices.GraphicsFamily;
+    }
 }
