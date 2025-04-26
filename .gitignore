@@ -1,11 +1,10 @@
 .vs
+.vscode
 .idea
-out
-bin
-bin-int
-scripts/__pycache__
-VoxelicousEngine/submodules/VulkanSDK
+build/
+build-Debug/
+build-Release/
+build-Dist/
 *.vcxproj.filters
 *.vcxproj
 *.sln
-Editor/imgui.ini

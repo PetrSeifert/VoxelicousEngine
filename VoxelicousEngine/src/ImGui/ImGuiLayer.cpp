@@ -55,7 +55,7 @@ namespace VoxelicousEngine
 
     void ImGuiLayer::OnUpdate(const VkCommandBuffer commandBuffer)
     {
-        const auto newTime = std::chrono::high_resolution_clock::now();
+        const auto newTime = std::chrono::steady_clock::now();
         float frameTime = std::chrono::duration<float>(newTime - m_CurrentTime).count();
         m_CurrentTime = newTime;
 

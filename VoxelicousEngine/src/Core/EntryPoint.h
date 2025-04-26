@@ -3,7 +3,7 @@
 
 extern auto VoxelicousEngine::CreateApp() -> VoxelicousEngine::App*;
 
-inline auto main(int  /*argc*/, char**  /*argv*/) -> int
+auto main(int  /*argc*/, char**  /*argv*/) -> int
 {
     VoxelicousEngine::Log::Init();
     VE_CORE_WARN("Init Log!");

@@ -1,14 +1,15 @@
 ﻿#include "vepch.h"
 #include "SpirvHelper.h"
 
-#include <filesystem>
+#include <fstream>
+#include <iostream>
 
-std::string ReadFile(const std::filesystem::path& filePath)
+std::string SpirvHelper::ReadFile(const std::string& filePath)
 {
     std::ifstream file(filePath, std::ios::ate | std::ios::binary);
  
     if(!file.is_open())
-        VE_CORE_ERROR("Failed to open file: {}", filePath.string());
+        VE_CORE_ERROR("Failed to open file: {}", filePath);
 
     const size_t fileSize = file.tellg();
     std::string buffer;
@@ -22,7 +23,7 @@ std::string ReadFile(const std::filesystem::path& filePath)
     return buffer;
 }
  
-std::vector<uint32_t> CompileShader(const std::filesystem::path& filePath, const shaderc_shader_kind kind, const bool optimize)
+std::vector<uint32_t> SpirvHelper::CompileShader(const std::string& filePath, const shaderc_shader_kind kind, const bool optimize)
 {
     const shaderc::Compiler compiler;
     shaderc::CompileOptions options;
@@ -32,7 +33,17 @@ std::vector<uint32_t> CompileShader(const std::filesystem::path& filePath, const
         options.SetOptimizationLevel(shaderc_optimization_level_size);
 
     const std::string& source = ReadFile(filePath);
-    const shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, kind, filePath.stem().string().c_str(), options);
+    
+    // Extract filename without extension for shader module name
+    std::string filename = filePath;
+    const size_t lastSlash = filePath.find_last_of("/\\");
+    if (lastSlash != std::string::npos)
+        filename = filePath.substr(lastSlash + 1);
+    const size_t lastDot = filename.find_last_of('.');
+    if (lastDot != std::string::npos)
+        filename = filename.substr(0, lastDot);
+    
+    const shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, kind, filename.c_str(), options);
  
     if(module.GetCompilationStatus() != shaderc_compilation_status_success)
     {

@@ -92,7 +92,7 @@ namespace VoxelicousEngine
 
     void DefaultLayer::OnUpdate(const VkCommandBuffer commandBuffer)
     {
-        const auto newTime = std::chrono::high_resolution_clock::now();
+        const auto newTime = std::chrono::steady_clock::now();
         const float frameTime = std::chrono::duration<float>(newTime - m_CurrentTime).count();
         m_CurrentTime = newTime;
         m_CameraController.MoveInPlaneXZ(m_Window.GetGLFW_Window(), frameTime, m_ViewerObject);

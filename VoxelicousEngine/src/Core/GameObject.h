@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include <gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace VoxelicousEngine
 {
