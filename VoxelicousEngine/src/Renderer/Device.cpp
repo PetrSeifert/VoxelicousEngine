@@ -169,19 +169,16 @@ namespace VoxelicousEngine
                 indices.GraphicsFamilyHasValue = true;
             }
             
-            if (surface != VK_NULL_HANDLE) 
-            {
-                VkBool32 presentSupport = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
-                if (queueFamily.queueCount > 0 && presentSupport)
-                {
-                    indices.PresentFamily = i;
-                    indices.PresentFamilyHasValue = true;
-                }
-            }
+            VkBool32 presentSupport = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
             
-            if ((indices.GraphicsFamilyHasValue && surface == VK_NULL_HANDLE) || 
-                (indices.IsComplete() && surface != VK_NULL_HANDLE))
+            if (queueFamily.queueCount > 0 && presentSupport)
+            {
+                indices.PresentFamily = i;
+                indices.PresentFamilyHasValue = true;
+            }
+
+            if (indices.IsComplete())
             {
                 break;
             }
@@ -394,12 +391,5 @@ namespace VoxelicousEngine
         {
             throw std::runtime_error("failed to bind image memory!");
         }
-    }
-
-    uint32_t Device::GetGraphicsQueueFamily() const
-    {
-        // Get the graphics queue family index
-        QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice, VK_NULL_HANDLE);
-        return indices.GraphicsFamily;
     }
 }
