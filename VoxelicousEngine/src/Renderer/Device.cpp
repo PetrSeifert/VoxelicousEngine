@@ -1,6 +1,7 @@
 #include "vepch.h"
 #include "Device.h"
 
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
 namespace VoxelicousEngine
@@ -70,6 +71,12 @@ namespace VoxelicousEngine
         VkPhysicalDeviceFeatures deviceFeatures = {};
         deviceFeatures.samplerAnisotropy = VK_TRUE;
 
+        // Enable shader printf feature
+        std::vector<VkValidationFeatureEnableEXT> shaderValidationFeatures = {VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT};
+        VkValidationFeaturesEXT validation_features{VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT};
+        validation_features.enabledValidationFeatureCount = 1;
+        validation_features.pEnabledValidationFeatures    = shaderValidationFeatures.data();
+
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
@@ -79,6 +86,8 @@ namespace VoxelicousEngine
         createInfo.pEnabledFeatures = &deviceFeatures;
         createInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
         createInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
+        // Chain the printf features struct to pNext
+        createInfo.pNext = &shaderPrintfFeatures; 
 
         createInfo.enabledLayerCount = 0;
 
@@ -123,6 +132,13 @@ namespace VoxelicousEngine
 
         VkPhysicalDeviceFeatures supportedFeatures;
         vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+        // Check for shader printf feature support
+        VkValidationFeatureEnableEXT printfFeatures = VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT;
+        VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+        deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        deviceFeatures2.pNext = &printfFeatures; // Chain the struct
+        vkGetPhysicalDeviceFeatures2(device, &deviceFeatures2); 
 
         return indices.IsComplete() && extensionsSupported && swapChainAdequate &&
             supportedFeatures.samplerAnisotropy;

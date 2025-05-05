@@ -1,15 +1,16 @@
 #pragma once
 
-#include "vulkan/vulkan.h"
+#include "Core/Core.h"
 #include "Events/Event.h"
+#include <vulkan/vulkan.h> // Include Vulkan for VkCommandBuffer
 
 namespace VoxelicousEngine
 {
     class Layer
     {
     public:
-        explicit Layer(std::string name = "Layer");
-        virtual ~Layer();
+        explicit Layer(const std::string& name = "Layer");
+        virtual ~Layer() = default;
 
         virtual void OnAttach()
         {
@@ -19,11 +20,19 @@ namespace VoxelicousEngine
         {
         }
 
-        virtual void OnUpdate(VkCommandBuffer commandBuffer)
+        virtual void OnUpdate()
         {
         }
 
         virtual void OnEvent(Event& event)
+        {
+        }
+
+        virtual void UpdateGpuResources(VkCommandBuffer commandBuffer)
+        {
+        }
+
+        virtual void OnRender(VkCommandBuffer commandBuffer)
         {
         }
 

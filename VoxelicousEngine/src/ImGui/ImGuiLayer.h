@@ -18,7 +18,8 @@ namespace VoxelicousEngine
 
         void OnAttach() override;
         void OnDetach() override;
-        void OnUpdate(VkCommandBuffer commandBuffer) override;
+        void OnUpdate() override;
+        void OnRender(VkCommandBuffer commandBuffer) override;
         void OnEvent(Event& event) override;
 
     private:

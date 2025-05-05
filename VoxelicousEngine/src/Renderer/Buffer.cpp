@@ -7,6 +7,8 @@
 
 #include "vepch.h"
 #include "Buffer.h"
+#include "Core/Log.h"
+#include "Core/Core.h"
 
 
 namespace VoxelicousEngine
@@ -212,5 +214,47 @@ namespace VoxelicousEngine
     VkResult Buffer::InvalidateIndex(const int index) const
     {
         return Invalidate(m_AlignmentSize, index * m_AlignmentSize);
+    }
+
+    void Buffer::UploadDataViaStaging(const void* data, const VkDeviceSize size, const VkDeviceSize offset) 
+    {
+        VE_CORE_ASSERT(data != nullptr, "Cannot upload null data!");
+        VE_CORE_ASSERT(size > 0, "Cannot upload zero size data!");
+        VE_CORE_ASSERT(offset + size <= m_BufferSize, "Upload exceeds buffer bounds!");
+
+        // 1. Create staging buffer (Host Visible & Coherent)
+        Buffer stagingBuffer{
+            m_Device,
+            size, // Size of data to upload
+            1,    // instance count
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        };
+
+        // 2. Map staging buffer and copy data to it
+        stagingBuffer.Map();
+        stagingBuffer.WriteToBuffer(data, size); // Use WriteToBuffer for the host-visible staging buffer
+        // No flush needed due to HOST_COHERENT_BIT
+        stagingBuffer.Unmap(); // Unmap after writing
+
+        // 3. Perform copy from staging buffer to destination buffer
+        VkCommandBuffer commandBuffer = m_Device.BeginSingleTimeCommands();
+
+        VkBufferCopy copyRegion{};
+        copyRegion.srcOffset = 0;      // Copy from beginning of staging buffer
+        copyRegion.dstOffset = offset; // Copy to the specified offset in the destination buffer
+        copyRegion.size = size;        // Copy the specified size
+        
+        vkCmdCopyBuffer(
+            commandBuffer,
+            stagingBuffer.GetBuffer(), // Source is staging buffer
+            m_Buffer,                  // Destination is this buffer
+            1, 
+            &copyRegion
+        );
+
+        m_Device.EndSingleTimeCommands(commandBuffer);
+        
+        // Staging buffer is automatically destroyed when it goes out of scope
     }
 }

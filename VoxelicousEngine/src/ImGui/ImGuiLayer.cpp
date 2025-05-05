@@ -55,20 +55,30 @@ namespace VoxelicousEngine
         ImGui::DestroyContext();
     }
 
-    void ImGuiLayer::OnUpdate(const VkCommandBuffer commandBuffer)
+    void ImGuiLayer::OnUpdate()
     {
         const auto newTime = std::chrono::steady_clock::now();
         float frameTime = std::chrono::duration<float>(newTime - m_CurrentTime).count();
         m_CurrentTime = newTime;
 
-        float aspect = m_Renderer.GetAspectRatio();
-
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        
         ImGui::ShowDemoWindow();
+        
         ImGui::Render();
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer, nullptr);
+    }
+
+    void ImGuiLayer::OnRender(VkCommandBuffer commandBuffer)
+    {
+        ImDrawData* draw_data = ImGui::GetDrawData();
+        
+        if (!draw_data || draw_data->CmdListsCount == 0) {
+            return;
+        }
+        
+        ImGui_ImplVulkan_RenderDrawData(draw_data, commandBuffer, nullptr);
     }
 
     void ImGuiLayer::OnEvent(Event& event)

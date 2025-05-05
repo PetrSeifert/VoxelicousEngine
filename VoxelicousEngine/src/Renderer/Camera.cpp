@@ -44,11 +44,15 @@ void Camera::SetViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3
     m_ViewMatrix[3][0] = -dot(u, position);
     m_ViewMatrix[3][1] = -dot(v, position);
     m_ViewMatrix[3][2] = -dot(w, position);
+    
+    m_Position = position; // Store position
 }
 
 void Camera::SetViewTarget(const glm::vec3 position, const glm::vec3 target, const glm::vec3 up)
 {
     SetViewDirection(position, target - position, up);
+    // m_Position is set implicitly by SetViewDirection call above
+    // m_Position = position; // No need to set again
 }
 
 void Camera::SetViewYXZ(const glm::vec3 position, const glm::vec3 rotation)
@@ -75,4 +79,6 @@ void Camera::SetViewYXZ(const glm::vec3 position, const glm::vec3 rotation)
     m_ViewMatrix[3][0] = -dot(u, position);
     m_ViewMatrix[3][1] = -dot(v, position);
     m_ViewMatrix[3][2] = -dot(w, position);
+
+    m_Position = position; // Store position
 }

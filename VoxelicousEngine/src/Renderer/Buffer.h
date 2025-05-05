@@ -22,7 +22,24 @@ namespace VoxelicousEngine
         VkResult Map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
         void Unmap();
 
+        /**
+         * Copies the specified data to the mapped buffer. REQUIRES the buffer to be mapped and host-visible.
+         *
+         * @param data Pointer to the data to copy
+         * @param size (Optional) Size of the data to copy. Pass VK_WHOLE_SIZE to flush the complete buffer range.
+         * @param offset (Optional) Byte offset from beginning of mapped region
+         */
         void WriteToBuffer(const void* data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
+
+        /**
+         * Uploads data to this buffer (potentially device-local) using a temporary host-visible staging buffer.
+         *
+         * @param data Pointer to the data to copy
+         * @param size Size of the data to copy.
+         * @param offset Byte offset in the destination buffer to copy to.
+         */
+        void UploadDataViaStaging(const void* data, VkDeviceSize size, VkDeviceSize offset = 0);
+
         VkResult Flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
         VkDescriptorBufferInfo DescriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
         VkResult Invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;

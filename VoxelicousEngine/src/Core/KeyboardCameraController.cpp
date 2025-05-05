@@ -8,8 +8,8 @@ namespace VoxelicousEngine
         glm::vec3 rotate{0};
         if (glfwGetKey(window, Keys.LookRight) == GLFW_PRESS) rotate.y += 1.f;
         if (glfwGetKey(window, Keys.LookLeft) == GLFW_PRESS) rotate.y -= 1.f;
-        if (glfwGetKey(window, Keys.LookUp) == GLFW_PRESS) rotate.x += 1.f;
-        if (glfwGetKey(window, Keys.LookDown) == GLFW_PRESS) rotate.x -= 1.f;
+        if (glfwGetKey(window, Keys.LookUp) == GLFW_PRESS) rotate.x -= 1.f;
+        if (glfwGetKey(window, Keys.LookDown) == GLFW_PRESS) rotate.x += 1.f;
 
         if (dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
         {
@@ -22,7 +22,7 @@ namespace VoxelicousEngine
         const float yaw = gameObject.Transform.Rotation.y;
         const glm::vec3 forwardDir{sin(yaw), 0.f, cos(yaw)};
         const glm::vec3 rightDir{forwardDir.z, 0.f, -forwardDir.x};
-        const glm::vec3 upDir{0.f, -1.f, 0.f};
+        const glm::vec3 upDir{0.f, 1.f, 0.f};
 
         MoveDir = glm::vec3(0.f, 0.f, 0.f);
         if (glfwGetKey(window, Keys.MoveForward) == GLFW_PRESS) MoveDir += forwardDir;
@@ -32,19 +32,9 @@ namespace VoxelicousEngine
         if (glfwGetKey(window, Keys.MoveUp) == GLFW_PRESS) MoveDir += upDir;
         if (glfwGetKey(window, Keys.MoveDown) == GLFW_PRESS) MoveDir -= upDir;
 
-
         if (dot(MoveDir, MoveDir) > std::numeric_limits<float>::epsilon())
         {
             gameObject.Transform.Translation += MoveSpeed * dt * normalize(MoveDir);
         }
-    }
-
-    glm::vec3 KeyboardCameraController::GetMoveDirection(GLFWwindow* window)
-    {
-        if (glfwGetKey(window, Keys.MoveForward) == GLFW_PRESS) return MoveDir = glm::vec3(0, -1, 0);
-        if (glfwGetKey(window, Keys.MoveBackward) == GLFW_PRESS) return MoveDir = glm::vec3(0, 1, 0);
-        if (glfwGetKey(window, Keys.MoveRight) == GLFW_PRESS) return MoveDir = glm::vec3(1, 0, 0);
-        if (glfwGetKey(window, Keys.MoveLeft) == GLFW_PRESS) return MoveDir = glm::vec3(-1, 0, 0);
-        return MoveDir;
     }
 }

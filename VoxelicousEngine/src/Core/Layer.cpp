@@ -3,11 +3,8 @@
 
 namespace VoxelicousEngine
 {
-    Layer::Layer(std::string name)
-        : m_DebugName(std::move(name))
+    Layer::Layer(const std::string& name)
+        : m_DebugName(name)
     {
     }
-
-    Layer::~Layer()
-    = default;
 }

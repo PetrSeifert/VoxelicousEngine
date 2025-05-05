@@ -23,7 +23,6 @@ namespace VoxelicousEngine
         };
 
         void MoveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
-        glm::vec3 GetMoveDirection(GLFWwindow* window);
 
         KeyMappings Keys{};
         float MoveSpeed{3.f};

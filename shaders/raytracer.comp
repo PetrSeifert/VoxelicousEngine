@@ -1,0 +1,287 @@
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+// Bindings from VoxelRaytraceSystem
+layout(set = 0, binding = 0) uniform ComputeUbo {
+    mat4 inverseView;
+    mat4 inverseProjection;
+    vec4 cameraPosition;
+    vec2 resolution;
+    vec4 octreeCenter; // w component is padding
+    float octreeSize;
+} ubo;
+
+// Output image (R32G32B32A32_SFLOAT format)
+layout(set = 0, binding = 1, rgba32f) uniform image2D outputImage;
+
+// SVO data structures
+struct OctreeNode {
+    uint firstChildIndex;
+    uint dataIndex;
+};
+
+struct Voxel {
+    uint materialID;
+    uint isSolid; // Using uint instead of bool for alignment/padding
+};
+
+struct VoxelMaterial {
+    vec3 color;
+    float emissionStrength;
+};
+
+// SVO buffers
+layout(std430, set = 0, binding = 2) readonly buffer NodePool {
+    OctreeNode nodes[];
+};
+
+layout(std430, set = 0, binding = 3) readonly buffer VoxelPalette {
+    Voxel voxels[];
+};
+
+layout(std430, set = 0, binding = 4) readonly buffer MaterialPalette {
+    VoxelMaterial materials[];
+};
+
+// Constants from SparseVoxelOctree.cpp
+const uint ROOT_NODE_INDEX = 1; // Index 0 is reserved as null
+const float MAX_DISTANCE = 100.0;
+const int MAX_STEPS = 128;
+
+// Ray structure
+struct Ray {
+    vec3 origin;
+    vec3 direction;
+    vec3 invDirection; // Precomputed inverse direction
+};
+
+// Hit information
+struct HitInfo {
+    bool hit;
+    float distance;
+    vec3 position;
+    vec3 normal;
+    uint materialID;
+};
+
+// AABB intersection test (uses precomputed inverse direction)
+bool intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax, out float tMin, out float tMax) {
+    vec3 t0 = (boxMin - ray.origin) * ray.invDirection;
+    vec3 t1 = (boxMax - ray.origin) * ray.invDirection;
+    
+    vec3 tMinVec = min(t0, t1);
+    vec3 tMaxVec = max(t0, t1);
+    
+    tMin = max(max(tMinVec.x, tMinVec.y), tMinVec.z);
+    tMax = min(min(tMaxVec.x, tMaxVec.y), tMaxVec.z);
+    
+    return tMax >= tMin && tMax > 0.0;
+}
+
+// SVO traversal
+HitInfo traverseOctree(Ray ray, float octreeSize, vec3 octreeCenter) {
+    HitInfo result;
+    result.hit = false;
+    result.distance = MAX_DISTANCE;
+    
+    // Calculate octree bounds using xyz
+    vec3 rootMin = octreeCenter.xyz - vec3(octreeSize * 0.5);
+    vec3 rootMax = octreeCenter.xyz + vec3(octreeSize * 0.5);
+    
+    // Check if ray intersects the root bounds
+    float tMin, tMax;
+    if (!intersectAABB(ray, rootMin, rootMax, tMin, tMax)) {
+        return result;
+    }
+    
+    // Initialize stack for traversal (simulating recursion)
+    const int MAX_DEPTH = 20; // Should be sufficient for most octrees
+    uint nodeIndices[MAX_DEPTH];
+    vec3 nodeMinCoords[MAX_DEPTH];
+    vec3 nodeMaxCoords[MAX_DEPTH];
+    float nodeTMin[MAX_DEPTH];
+    int stackIndex = 0;
+    
+    // Push root node onto stack
+    nodeIndices[0] = ROOT_NODE_INDEX;
+    nodeMinCoords[0] = rootMin;
+    nodeMaxCoords[0] = rootMax;
+    nodeTMin[0] = tMin;
+    
+    // Traversal loop
+    while (stackIndex >= 0) {
+        // Pop stack
+        uint nodeIndex = nodeIndices[stackIndex];
+        vec3 nodeMin = nodeMinCoords[stackIndex];
+        vec3 nodeMax = nodeMaxCoords[stackIndex];
+        float currentTMin = nodeTMin[stackIndex];
+        stackIndex--;
+        
+        // Skip if we already found a closer hit
+        if (currentTMin >= result.distance) {
+            continue;
+        }
+        
+        // Get current node
+        OctreeNode node = nodes[nodeIndex];
+        
+        // If leaf node, check for hit
+        if (node.firstChildIndex == 0) {
+            // Leaf node with voxel data
+            Voxel voxel = voxels[node.dataIndex];
+            
+            // Skip if not solid
+            if (voxel.isSolid == 0) {
+                continue;
+            }
+            
+            // This is a solid voxel - register hit
+            result.hit = true;
+            result.distance = currentTMin;
+            result.position = ray.origin + ray.direction * currentTMin;
+            
+            // Calculate normal based on the face that was hit
+            vec3 center = (nodeMin + nodeMax) * 0.5;
+            vec3 halfSize = (nodeMax - nodeMin) * 0.5;
+            vec3 localPos = (result.position - center) / halfSize;
+            
+            // Find largest component to determine normal
+            float maxComp = max(abs(localPos.x), max(abs(localPos.y), abs(localPos.z)));
+            if (maxComp == abs(localPos.x)) {
+                result.normal = vec3(sign(localPos.x), 0.0, 0.0);
+            } else if (maxComp == abs(localPos.y)) {
+                result.normal = vec3(0.0, sign(localPos.y), 0.0);
+            } else {
+                result.normal = vec3(0.0, 0.0, sign(localPos.z));
+            }
+            
+            result.materialID = voxel.materialID;
+            continue;
+        }
+        
+        // Internal node - traverse children
+        vec3 nodeCenter = (nodeMin + nodeMax) * 0.5;
+        
+        // Calculate child AABB bounds and push onto stack in front-to-back order
+        // Determine the order based on ray direction
+        int orderX = ray.direction.x >= 0.0 ? 0 : 1;
+        int orderY = ray.direction.y >= 0.0 ? 0 : 2;
+        int orderZ = ray.direction.z >= 0.0 ? 0 : 4;
+        
+        // Test all 8 children, pushing them onto stack in correct order
+        for (int i = 0; i < 8; i++) {
+            // Determine actual child index based on traversal order
+            int childIndex = i ^ orderX ^ orderY ^ orderZ;
+            
+            // Calculate child bounds
+            vec3 childMin = nodeMin;
+            vec3 childMax = nodeMax;
+            
+            // FIXED: Proper boolean expressions for GLSL
+            if ((childIndex & 1) != 0) childMin.x = nodeCenter.x; else childMax.x = nodeCenter.x;
+            if ((childIndex & 2) != 0) childMin.y = nodeCenter.y; else childMax.y = nodeCenter.y;
+            if ((childIndex & 4) != 0) childMin.z = nodeCenter.z; else childMax.z = nodeCenter.z;
+            
+            // Test intersection with child AABB
+            float childTMin, childTMax;
+            if (intersectAABB(ray, childMin, childMax, childTMin, childTMax) && childTMin < result.distance) {
+                // Add child to stack if it's within our search range
+                stackIndex++;
+                if (stackIndex >= MAX_DEPTH) break; // Prevent stack overflow
+                
+                nodeIndices[stackIndex] = node.firstChildIndex + childIndex;
+                nodeMinCoords[stackIndex] = childMin;
+                nodeMaxCoords[stackIndex] = childMax;
+                nodeTMin[stackIndex] = childTMin;
+            }
+        }
+    }
+    
+    return result;
+}
+
+// Shade the hit point
+vec4 shadeHit(HitInfo hit, Ray ray) {
+    if (!hit.hit) {
+        // Sky gradient for background
+        float t = 0.5 * (ray.direction.y + 1.0);
+        return vec4(mix(vec3(1.0, 1.0, 1.0), vec3(0.5, 0.7, 1.0), t), 1.0);
+    }
+    
+    // Get material properties
+    VoxelMaterial material = materials[hit.materialID];
+    
+    // Simple diffuse lighting with ambient
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 0.5));
+    float diffuse = max(0.0, dot(hit.normal, lightDir));
+    vec3 ambient = material.color * 0.2;
+    vec3 diffuseColor = material.color * diffuse * 0.8;
+    
+    // Add emission for glowing voxels
+    vec3 emission = material.color * material.emissionStrength;
+    
+    // Final color is ambient + diffuse + emission
+    vec3 finalColor = ambient + diffuseColor + emission;
+    
+    return vec4(finalColor, 1.0);
+}
+
+// Create a ray from camera for the given pixel
+Ray createCameraRay(uvec2 pixel) {
+    // Convert pixel to NDC space (-1 to 1)
+    vec2 uv = (vec2(pixel) + vec2(0.5)) / ubo.resolution.xy * 2.0 - 1.0;
+    
+    // Flip y-coordinate to correct for vertically flipped world
+    uv.y = -uv.y;
+    
+    // Create homogeneous point in NDC
+    vec4 target = vec4(uv, 1.0, 1.0);
+    
+    // Transform to world space
+    vec4 worldPos = ubo.inverseProjection * target;
+    worldPos = worldPos / worldPos.w;
+    worldPos = ubo.inverseView * worldPos;
+    
+    // Create ray
+    Ray ray;
+    ray.origin = ubo.cameraPosition.xyz;
+    ray.direction = normalize(worldPos.xyz - ray.origin);
+    // Precompute inverse direction, handling potential division by zero
+    ray.invDirection = 1.0 / ray.direction;
+    // Handle cases where direction component is zero (replace with large number)
+    if (ray.direction.x == 0.0) ray.invDirection.x = 1.0e38; 
+    if (ray.direction.y == 0.0) ray.invDirection.y = 1.0e38; 
+    if (ray.direction.z == 0.0) ray.invDirection.z = 1.0e38; 
+    
+    return ray;
+}
+
+void main() {
+    // Get current pixel
+    uvec2 pixel = gl_GlobalInvocationID.xy;
+    
+    // Skip if outside the image bounds
+    if (pixel.x >= uint(ubo.resolution.x) || pixel.y >= uint(ubo.resolution.y)) {
+        return;
+    }
+    
+    // Create camera ray
+    Ray ray = createCameraRay(pixel);
+    
+    // Get octree properties from UBO
+    // float octreeSize = 64.0; // Removed hardcoded value
+    // vec3 octreeCenter = vec3(octreeSize * 0.5); // Removed hardcoded value
+    
+    // Trace ray through octree using UBO values
+    // Pass only the xyz part of octreeCenter to the function
+    debugPrintfEXT("Size = %v4f", ubo.octreeSize);
+    debugPrintfEXT("Center = %v4f", ubo.octreeCenter.xyz);
+    HitInfo hitInfo = traverseOctree(ray, ubo.octreeSize, ubo.octreeCenter.xyz);
+    
+    // Shade the hit point
+    vec4 color = shadeHit(hitInfo, ray);
+    
+    // Write to output image
+    imageStore(outputImage, ivec2(pixel), color);
+}

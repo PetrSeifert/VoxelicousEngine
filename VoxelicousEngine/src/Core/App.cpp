@@ -78,36 +78,39 @@ namespace VoxelicousEngine
 
     void App::Run()
     {
-        const WindowResizeEvent e(1280, 720);
-        if (e.IsInCategory(EventCategoryApp))
-        {
-            VE_TRACE(e);
-        }
-        if (e.IsInCategory(EventCategoryInput))
-        {
-            VE_TRACE(e);
-        }
-
         while (m_Running)
         {
+            for (Layer* layer : m_LayerStack)
+                 layer->OnUpdate();
+
             if (const VkCommandBuffer commandBuffer = m_Renderer->BeginFrame())
             {
-                m_Renderer->BeginSwapChainRendererPass(commandBuffer);
-                for (Layer* layer : m_LayerStack)
-                    layer->OnUpdate(commandBuffer);
-                m_Renderer->EndSwapChainRendererPass(commandBuffer);
-                m_Renderer->EndFrame();
+                 for (Layer* layer : m_LayerStack)
+                     layer->UpdateGpuResources(commandBuffer);
 
-                m_Window->OnUpdate();
+                 m_Renderer->BeginSwapChainRendererPass(commandBuffer);
+                 
+                 for (Layer* layer : m_LayerStack)
+                     layer->OnRender(commandBuffer);
+                     
+                 m_Renderer->EndSwapChainRendererPass(commandBuffer);
+                 
+                 m_Renderer->EndFrame();
             }
+            
+            m_Window->OnUpdate();
         }
+        
+        vkDeviceWaitIdle(m_Device->GetDevice());
+        VE_CORE_INFO("Detaching layers...");
+        for (Layer* layer : m_LayerStack)
+            layer->OnDetach();
+        VE_CORE_INFO("App shutdown complete.");
     }
 
     bool App::OnWindowClose(const WindowCloseEvent& e)
     {
-        vkDeviceWaitIdle(m_Device->GetDevice());
-        for (Layer* layer : m_LayerStack)
-            layer->OnDetach();
+        VE_CORE_INFO("Window close event received.");
         m_Running = false;
         return true;
     }

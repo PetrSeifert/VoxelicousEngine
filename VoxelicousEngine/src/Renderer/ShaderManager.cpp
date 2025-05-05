@@ -246,6 +246,8 @@ namespace VoxelicousEngine
             // Add optimization flag if requested
             if (optimize)
                 cmd += "-O ";
+            else 
+                cmd += "-g ";
             
             // Input file and output file with an extra closing quote
             cmd += "\"" + normalizedInputPath + "\" -o \"" + normalizedOutputPath + "\"\"";

@@ -31,8 +31,8 @@ class FirstApp : public VoxelicousEngine::App
 public:
 	FirstApp()
 	{
-		PushLayer(new VoxelicousEngine::ImGuiLayer(*m_Renderer, *m_Device, *m_GlobalPool));
-		PushLayer(new VoxelicousEngine::DefaultLayer(*m_Renderer, *m_Device, *m_GlobalPool));
+		PushLayer(new VoxelicousEngine::DefaultLayer(*m_Renderer, *m_Device));
+		PushOverlay(new VoxelicousEngine::ImGuiLayer(*m_Renderer, *m_Device, *m_GlobalPool));
 	}
 
 	~FirstApp() override = default;
